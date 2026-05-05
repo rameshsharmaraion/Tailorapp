@@ -69,6 +69,10 @@ export const ClientProvider = ({ children }) => {
 
   const getClient = (id) => clients.find(c => c.id === id);
 
+  const updateClient = (id, updatedData) => {
+    setClients(prev => prev.map(c => c.id === id ? { ...c, ...updatedData } : c));
+  };
+
   const addProject = (project) => {
     setProjects(prev => [...prev, { ...project, id: Date.now().toString(), date: new Date().toISOString() }]);
   };
@@ -76,7 +80,7 @@ export const ClientProvider = ({ children }) => {
   const getClientProjects = (clientId) => projects.filter(p => p.clientId === clientId);
 
   return (
-    <ClientContext.Provider value={{ clients, addClient, getClient, projects, addProject, getClientProjects }}>
+    <ClientContext.Provider value={{ clients, addClient, updateClient, getClient, projects, addProject, getClientProjects }}>
       {children}
     </ClientContext.Provider>
   );

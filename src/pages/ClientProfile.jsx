@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useClient } from '../context/ClientContext';
-import { Ruler, Scissors } from 'lucide-react';
+import { Ruler, Scissors, Edit } from 'lucide-react';
 
 const ClientProfile = () => {
   const { id } = useParams();
@@ -18,9 +18,14 @@ const ClientProfile = () => {
           <h1>{client.name}</h1>
           <p>Age: {client.age} | {client.phone} | {client.address}</p>
         </div>
-        <Link to={`/client/${id}/new-project`} className="btn btn-primary">
-          <Scissors size={18} /> Draft New Project
-        </Link>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Link to={`/edit-client/${id}`} className="btn btn-outline">
+            <Edit size={18} /> Edit Profile
+          </Link>
+          <Link to={`/client/${id}/new-project`} className="btn btn-primary">
+            <Scissors size={18} /> Draft New Project
+          </Link>
+        </div>
       </div>
 
       <div className="grid-2 mb-4">

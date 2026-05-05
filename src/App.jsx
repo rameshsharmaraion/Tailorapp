@@ -47,6 +47,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/client/:id" element={<ClientProfile />} />
             <Route path="/new-client" element={<MeasurementInput />} />
+            <Route path="/edit-client/:id" element={<MeasurementInput />} />
             <Route path="/problem-solver" element={<ProblemSolver />} />
             <Route path="/pricing" element={<PricingChart />} />
             <Route path="/size-chart" element={<SizeChart />} />

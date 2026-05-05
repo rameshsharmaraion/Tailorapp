@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useClient } from '../context/ClientContext';
 import { Info } from 'lucide-react';
 
 const MeasurementInput = () => {
-  const { addClient } = useClient();
+  const { id } = useParams();
+  const { addClient, getClient, updateClient } = useClient();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -14,11 +15,25 @@ const MeasurementInput = () => {
     posturalNotes: '', neckline: 'V-Neck', hemline: 'Knee-length', silhouette: 'A-Line'
   });
 
+  useEffect(() => {
+    if (id) {
+      const client = getClient(id);
+      if (client) {
+        setFormData({
+          name: client.name, age: client.age, phone: client.phone, address: client.address,
+          ...client.metrics,
+          posturalNotes: client.posturalNotes.join(', '),
+          ...client.stylePreferences
+        });
+      }
+    }
+  }, [id, getClient]);
+
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const client = {
+    const clientData = {
       name: formData.name, age: formData.age, phone: formData.phone, address: formData.address,
       metrics: {
         backLength: parseFloat(formData.backLength), frontLength: parseFloat(formData.frontLength), apexPoint: parseFloat(formData.apexPoint),
@@ -31,8 +46,13 @@ const MeasurementInput = () => {
         neckline: formData.neckline, hemline: formData.hemline, silhouette: formData.silhouette
       }
     };
-    addClient(client);
-    navigate('/');
+    if (id) {
+      updateClient(id, clientData);
+      navigate(`/client/${id}`);
+    } else {
+      addClient(clientData);
+      navigate('/');
+    }
   };
 
   const measureGuides = {
@@ -45,7 +65,7 @@ const MeasurementInput = () => {
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <h1 className="mb-4">New Client Intake</h1>
+      <h1 className="mb-4">{id ? 'Edit Client Profile' : 'New Client Intake'}</h1>
       
       <form onSubmit={handleSubmit}>
         <div className="glass-panel mb-4">
@@ -53,19 +73,19 @@ const MeasurementInput = () => {
           <div className="grid-2 mt-2">
             <div className="input-group">
               <label>Full Name</label>
-              <input type="text" name="name" required onChange={handleChange} />
+              <input type="text" name="name" required onChange={handleChange} value={formData.name} />
             </div>
             <div className="input-group">
               <label>Age</label>
-              <input type="number" name="age" required onChange={handleChange} />
+              <input type="number" name="age" required onChange={handleChange} value={formData.age} />
             </div>
             <div className="input-group">
               <label>Phone Number</label>
-              <input type="tel" name="phone" required onChange={handleChange} />
+              <input type="tel" name="phone" required onChange={handleChange} value={formData.phone} />
             </div>
             <div className="input-group">
               <label>Address</label>
-              <input type="text" name="address" required onChange={handleChange} />
+              <input type="text" name="address" required onChange={handleChange} value={formData.address} />
             </div>
           </div>
         </div>
@@ -82,7 +102,7 @@ const MeasurementInput = () => {
                     <span title={measureGuides[metric]} style={{ color: 'var(--accent-gold)', cursor: 'help' }}><Info size={16} /></span>
                   )}
                 </label>
-                <input type="number" step="0.1" name={metric} required onChange={handleChange} />
+                <input type="number" step="0.1" name={metric} required onChange={handleChange} value={formData[metric]} />
               </div>
             ))}
           </div>
@@ -92,7 +112,7 @@ const MeasurementInput = () => {
           <h2>Postural Notes & Style</h2>
           <div className="input-group">
             <label>Postural Notes (comma separated)</label>
-            <input type="text" name="posturalNotes" placeholder="e.g. Sloping shoulders, forward head" onChange={handleChange} />
+            <input type="text" name="posturalNotes" placeholder="e.g. Sloping shoulders, forward head" onChange={handleChange} value={formData.posturalNotes} />
           </div>
           <div className="grid-3 mt-2">
             <div className="input-group">
@@ -117,7 +137,7 @@ const MeasurementInput = () => {
         </div>
 
         <div style={{ textAlign: 'right' }}>
-          <button type="submit" className="btn btn-primary">Save Client Profile</button>
+          <button type="submit" className="btn btn-primary">{id ? 'Update Client' : 'Save Client Profile'}</button>
         </div>
       </form>
     </div>
