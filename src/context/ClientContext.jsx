@@ -70,7 +70,19 @@ export const ClientProvider = ({ children }) => {
   const getClient = (id) => clients.find(c => c.id === id);
 
   const updateClient = (id, updatedData) => {
-    setClients(prev => prev.map(c => c.id === id ? { ...c, ...updatedData } : c));
+    setClients(prev => prev.map(c => {
+      if (c.id === id) {
+        const historySnapshot = {
+          date: new Date().toISOString(),
+          metrics: { ...c.metrics },
+          posturalNotes: [...(c.posturalNotes || [])],
+          stylePreferences: { ...c.stylePreferences }
+        };
+        const newHistory = [...(c.history || []), historySnapshot];
+        return { ...c, ...updatedData, history: newHistory };
+      }
+      return c;
+    }));
   };
 
   const addProject = (project) => {
